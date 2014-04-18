@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.7.2" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+	<name>hrtime</name>
+	<channel>pecl.php.net</channel>
+	<summary>High resolution timing</summary>
+	<description>The extension implements a high resolution StopWatch class. It uses the the best possible APIs on different platforms. It also makes possible to implement a custom stopwatch using low level ticks delivered by the underlaying APIs.</description>
+	<lead>
+		<name>Anatol Belski</name>
+		<user>ab</user>
+		<email>ab@php.net</email>
+		<active>yes</active>
+	</lead>
+	<date>2014-04-18</date>
+	<version>
+		<release>0.4.3</release>
+		<api>0.4.3</api>
+	</version>
+	<stability>
+		<release>beta</release>
+		<api>beta</api>
+	</stability>
+	<license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+	<notes>
+		- first public release
+	</notes>
+	<contents>
+		<dir name="/">
+			<file role="src" name="config.m4"/>
+			<file role="src" name="config.w32"/>
+			<file role="doc" name="CREDITS"/>
+			<file role="src" name="hrtime.c"/>
+			<file role="doc" name="LICENSE"/>
+			<file role="src" name="php_hrtime.h"/>
+			<file role="doc" name="README.md"/>
+			<file role="src" name="timer.c"/>
+			<file role="src" name="timer.h"/>
+			<dir name="tests">
+				<file role="test" name="001.phpt"/>
+				<file role="test" name="002.phpt"/>
+				<file role="test" name="003.phpt"/>
+				<file role="test" name="004.phpt"/>
+				<file role="test" name="005.phpt"/>
+				<file role="test" name="006.phpt"/>
+				<file role="test" name="helper.inc"/>
+			</dir>
+		</dir>
+	</contents>
+	<dependencies>
+		<required>
+			<php>
+				<min>5.3</min>
+			</php>
+			<pearinstaller>
+				<min>1.4.0</min>
+			</pearinstaller>
+		</required>
+	</dependencies>
+	<providesextension>hrtime</providesextension>
+	<extsrcrelease/>
+	<!--<changelog>
+	</changelog>-->
+</package>
+<!--
+/*
+ * Local variables:
+ * tab-width: 4
+ * c-basic-offset: 4
+ * End:
+ * vim600: noet sw=4 ts=4 fdm=marker
+ * vim<600: noet sw=4 ts=4
+ */
+ -->
