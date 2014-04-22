@@ -11,13 +11,11 @@ for ($j = 0; $j < 4; $j++) {
 	$c = new HRTime\StopWatch; 
 
 	$t0 = microtime(true);
-	for ($i = 0; $i < 1024; $i++);
-	$t1 = microtime(true);
-	$elapsed0 = $t1 - $t0;
-
 	$c->start();
-	for ($i = 0; $i < 1024; $i++);
+	for ($i = 0; $i < (1024*1024); $i++);
+	$t1 = microtime(true);
 	$c->stop();
+	$elapsed0 = $t1 - $t0;
 
 	$e0 = $elapsed0;
 	$e1 = $c->getLastElapsedTime(HRTime\Unit::SECOND);
