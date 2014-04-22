@@ -332,13 +332,9 @@ PHP_METHOD(PerformanceCounter, getLastElapsedTicks)
 
 PHP_METHOD(PerformanceCounter, getFrequency)
 {/*{{{*/
-	struct ze_performance_counter_obj *zvco;
-
 	if (zend_parse_parameters_none() == FAILURE) {
 		return;
 	}
-
-	zvco = (struct ze_performance_counter_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
 
 	RETURN_LONG(timer_ticks_per_second());
 }/*}}}*/
