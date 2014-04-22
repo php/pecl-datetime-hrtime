@@ -75,3 +75,8 @@ TIMER_API deltatime_t    timer_ticks_to_seconds( const tick_t dt );
     \return  Current timestamp, in milliseconds */
 TIMER_API tick_t         timer_system( void );
 
+/* Compatibility stuff for php < 5.3.7*/
+#ifndef PHP_FE_END
+#define PHP_FE_END {NULL, NULL, NULL}
+#endif
+
