@@ -21,6 +21,8 @@
 	</stability>
 	<license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
 	<notes>
+		- PHP7 compatibility
+		- marked stable
 	</notes>
 	<contents>
 		<dir name="/">
