@@ -220,6 +220,7 @@ PHP_MINIT_FUNCTION(hrtime)
 	default_hrtime_handlers.clone_obj = NULL;
 #if PHP_MAJOR_VERSION >= 7
 	default_hrtime_handlers.offset = XtOffsetOf(struct ze_performance_counter_obj, zo);
+	default_hrtime_handlers.free_obj = php_performance_counter_obj_destroy;
 #endif
 #endif
 
