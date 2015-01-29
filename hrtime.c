@@ -95,6 +95,22 @@ zend_module_entry hrtime_module_entry = {
 ZEND_GET_MODULE(hrtime)
 #endif
 
+#if PHP_MAJOR_VERSION >= 7
+static zend_always_inline struct ze_performance_counter_obj * php_performance_counter_fetch_obj(zend_object *obj)
+{/*{{{*/
+	return (struct ze_performance_counter_obj *)((char *)obj - XtOffsetOf(struct ze_performance_counter_obj, zo));
+}/*}}}*/
+
+void
+php_performance_counter_obj_destroy(zend_object *obj)
+{/*{{{*/
+	struct ze_performance_counter_obj *zvco = php_performance_counter_fetch_obj(obj);
+
+	zend_object_std_dtor(&zvco->zo); /* ??? */
+
+	efree(zvco);
+}/*}}}*/
+#else
 void
 php_performance_counter_obj_destroy(void *obj TSRMLS_DC)
 {/*{{{*/
@@ -106,7 +122,28 @@ php_performance_counter_obj_destroy(void *obj TSRMLS_DC)
 
 	efree(zvco);
 }/*}}}*/
+#endif
 
+#if PHP_MAJOR_VERSION >= 7
+zend_object *
+php_performance_counter_obj_init(zend_class_entry *ze)
+{/*{{{*/
+	struct ze_performance_counter_obj *zvco;
+
+	zvco = ecalloc(1, sizeof(struct ze_performance_counter_obj));
+	
+	zend_object_std_init(&zvco->zo, ze);
+	zvco->zo.handlers = &default_hrtime_handlers;
+
+	zvco->is_running = 0;
+	zvco->start = 0;
+	zvco->elapsed = 0;
+	zvco->elapsed_ref = 0;
+
+
+	return &zvco->zo;
+}/*}}}*/
+#else
 zend_object_value
 php_performance_counter_obj_init(zend_class_entry *ze TSRMLS_DC)
 {/*{{{*/
@@ -144,6 +181,7 @@ php_performance_counter_obj_init(zend_class_entry *ze TSRMLS_DC)
 
 	return ret;
 }/*}}}*/
+#endif /* php_performance_counter_obj_init */
 
 /* {{{ PHP_INI
  */
@@ -185,6 +223,9 @@ PHP_MINIT_FUNCTION(hrtime)
 #if PHP_VERSION_ID >= 50399
 	memcpy(&default_hrtime_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	default_hrtime_handlers.clone_obj = NULL;
+#if PHP_MAJOR_VERSION >= 7
+	default_hrtime_handlers.offset = XtOffsetOf(struct ze_performance_counter_obj, zo);
+#endif
 #endif
 
 	/* Init internal classes */
@@ -194,7 +235,11 @@ PHP_MINIT_FUNCTION(hrtime)
 
 	INIT_CLASS_ENTRY(ce, "HRTime\\StopWatch", StopWatch_methods);
 	ce.create_object = php_performance_counter_obj_init;
+#if PHP_MAJOR_VERSION >= 7
+	StopWatch_ce = zend_register_internal_class_ex(&ce, PerformanceCounter_ce);
+#else
 	StopWatch_ce = zend_register_internal_class_ex(&ce, PerformanceCounter_ce, "HRTime\\PerformanceCounter" TSRMLS_CC);
+#endif
 
 	INIT_CLASS_ENTRY(ce, "HRTime\\Unit", NULL);
 	Unit_ce = zend_register_internal_class(&ce TSRMLS_CC);
@@ -264,7 +309,11 @@ PHP_METHOD(PerformanceCounter, start)
 		return;
 	}
 
+#if PHP_MAJOR_VERSION >= 7
+	zvco = php_performance_counter_fetch_obj(Z_OBJ_P(getThis()));
+#else
 	zvco = (struct ze_performance_counter_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+#endif
 
 	if (zvco->is_running) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "The counter is already running");
@@ -283,7 +332,11 @@ PHP_METHOD(PerformanceCounter, stop)
 		return;
 	}
 
+#if PHP_MAJOR_VERSION >= 7
+	zvco = php_performance_counter_fetch_obj(Z_OBJ_P(getThis()));
+#else
 	zvco = (struct ze_performance_counter_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+#endif
 
 	if (!zvco->is_running) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "The counter is not running");
@@ -303,7 +356,11 @@ PHP_METHOD(PerformanceCounter, getElapsedTicks)
 		return;
 	}
 
+#if PHP_MAJOR_VERSION >= 7
+	zvco = php_performance_counter_fetch_obj(Z_OBJ_P(getThis()));
+#else
 	zvco = (struct ze_performance_counter_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+#endif
 
 	if (zvco->is_running) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Counter is still running");
@@ -320,7 +377,11 @@ PHP_METHOD(PerformanceCounter, getLastElapsedTicks)
 		return;
 	}
 
+#if PHP_MAJOR_VERSION >= 7
+	zvco = php_performance_counter_fetch_obj(Z_OBJ_P(getThis()));
+#else
 	zvco = (struct ze_performance_counter_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+#endif
 
 	if (zvco->is_running) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Counter is still running");
@@ -347,7 +408,11 @@ PHP_METHOD(PerformanceCounter, isRunning)
 		return;
 	}
 
+#if PHP_MAJOR_VERSION >= 7
+	zvco = php_performance_counter_fetch_obj(Z_OBJ_P(getThis()));
+#else
 	zvco = (struct ze_performance_counter_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+#endif
 
 	RETURN_BOOL(zvco->is_running);
 }/*}}}*/
@@ -376,13 +441,17 @@ PHP_METHOD(PerformanceCounter, isRunning)
 PHP_METHOD(StopWatch, getElapsedTime)
 {/*{{{*/
 	struct ze_performance_counter_obj *zvco;
-	long unit;
+	zend_long unit;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|l", &unit) == FAILURE) {
 		RETURN_NULL();
 	}
 
+#if PHP_MAJOR_VERSION >= 7
+	zvco = php_performance_counter_fetch_obj(Z_OBJ_P(getThis()));
+#else
 	zvco = (struct ze_performance_counter_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+#endif
 
 	RET_TIME_BY_UNIT(zvco->elapsed, unit);
 }/*}}}*/
@@ -390,13 +459,17 @@ PHP_METHOD(StopWatch, getElapsedTime)
 PHP_METHOD(StopWatch, getLastElapsedTime)
 {/*{{{*/
 	struct ze_performance_counter_obj *zvco;
-	long unit;
+	zend_long unit;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|l", &unit) == FAILURE) {
 		RETURN_NULL();
 	}
 
+#if PHP_MAJOR_VERSION >= 7
+	zvco = php_performance_counter_fetch_obj(Z_OBJ_P(getThis()));
+#else
 	zvco = (struct ze_performance_counter_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+#endif
 
 	RET_TIME_BY_UNIT(zvco->elapsed_ref, unit);
 }/*}}}*/

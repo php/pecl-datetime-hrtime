@@ -76,6 +76,19 @@ ZEND_END_MODULE_GLOBALS(hrtime)*/
 #define HRTIME_G(v) (hrtime_globals.v)
 #endif
 
+#if PHP_MAJOR_VERSION < 7
+typedef long zend_long;
+#endif
+
+#if PHP_MAJOR_VERSION >= 7
+struct ze_performance_counter_obj {
+	tick_t start;
+	tick_t elapsed;
+	tick_t elapsed_ref;
+	zend_bool is_running;
+	zend_object zo;
+};
+#else
 struct ze_performance_counter_obj {
 	zend_object zo;
 	tick_t start;
@@ -83,6 +96,7 @@ struct ze_performance_counter_obj {
 	tick_t elapsed_ref;
 	zend_bool is_running;
 };
+#endif
 
 #if PHP_VERSION_ID >= 50399
 zend_object_handlers default_hrtime_handlers;
