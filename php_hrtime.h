@@ -88,6 +88,12 @@ struct ze_performance_counter_obj {
 	zend_bool is_running;
 	zend_object zo;
 };
+
+static zend_always_inline struct ze_performance_counter_obj *
+php_performance_counter_fetch_obj(zend_object *obj)
+{/*{{{*/
+	return (struct ze_performance_counter_obj *)((char *)obj - XtOffsetOf(struct ze_performance_counter_obj, zo));
+}/*}}}*/
 #else
 struct ze_performance_counter_obj {
 	zend_object zo;

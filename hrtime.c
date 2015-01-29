@@ -96,11 +96,6 @@ ZEND_GET_MODULE(hrtime)
 #endif
 
 #if PHP_MAJOR_VERSION >= 7
-static zend_always_inline struct ze_performance_counter_obj * php_performance_counter_fetch_obj(zend_object *obj)
-{/*{{{*/
-	return (struct ze_performance_counter_obj *)((char *)obj - XtOffsetOf(struct ze_performance_counter_obj, zo));
-}/*}}}*/
-
 void
 php_performance_counter_obj_destroy(zend_object *obj)
 {/*{{{*/
@@ -130,7 +125,7 @@ php_performance_counter_obj_init(zend_class_entry *ze)
 {/*{{{*/
 	struct ze_performance_counter_obj *zvco;
 
-	zvco = ecalloc(1, sizeof(struct ze_performance_counter_obj));
+	zvco = (struct ze_performance_counter_obj *)ecalloc(1, sizeof(struct ze_performance_counter_obj));
 	
 	zend_object_std_init(&zvco->zo, ze);
 	zvco->zo.handlers = &default_hrtime_handlers;
