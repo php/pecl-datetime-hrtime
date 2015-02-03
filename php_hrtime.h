@@ -31,7 +31,7 @@
 #ifndef PHP_HRTIME_H
 #define PHP_HRTIME_H
 
-#define PHP_HRTIME_VERSION "0.5.0"
+#define PHP_HRTIME_VERSION "0.5.1"
 
 extern zend_module_entry hrtime_module_entry;
 #define phpext_hrtime_ptr &hrtime_module_entry
