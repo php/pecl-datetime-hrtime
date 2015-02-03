@@ -102,8 +102,6 @@ php_performance_counter_obj_destroy(zend_object *obj)
 	struct ze_performance_counter_obj *zvco = php_performance_counter_fetch_obj(obj);
 
 	zend_object_std_dtor(&zvco->zo); /* ??? */
-
-	efree(zvco);
 }/*}}}*/
 #else
 void
