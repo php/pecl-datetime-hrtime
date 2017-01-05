@@ -56,15 +56,15 @@ PHP_RINIT_FUNCTION(hrtime);
 PHP_RSHUTDOWN_FUNCTION(hrtime);
 PHP_MINFO_FUNCTION(hrtime);
 
-PHP_METHOD(PerformanceCounter, start);
-PHP_METHOD(PerformanceCounter, stop);
-PHP_METHOD(PerformanceCounter, getElapsedTicks);
-PHP_METHOD(PerformanceCounter, getLastElapsedTicks);
 PHP_METHOD(PerformanceCounter, getFrequency);
-PHP_METHOD(PerformanceCounter, isRunning);
 PHP_METHOD(PerformanceCounter, getTicks);
 PHP_METHOD(PerformanceCounter, getTicksSince);
 
+PHP_METHOD(StopWatch, start);
+PHP_METHOD(StopWatch, stop);
+PHP_METHOD(StopWatch, getElapsedTicks);
+PHP_METHOD(StopWatch, getLastElapsedTicks);
+PHP_METHOD(StopWatch, isRunning);
 PHP_METHOD(StopWatch, getElapsedTime);
 PHP_METHOD(StopWatch, getLastElapsedTime);
 
@@ -83,7 +83,7 @@ typedef long zend_long;
 #endif
 
 #if PHP_MAJOR_VERSION >= 7
-struct ze_performance_counter_obj {
+struct ze_stop_watch_obj {
 	tick_t start;
 	tick_t elapsed;
 	tick_t elapsed_ref;
@@ -91,13 +91,13 @@ struct ze_performance_counter_obj {
 	zend_object zo;
 };
 
-static zend_always_inline struct ze_performance_counter_obj *
-php_performance_counter_fetch_obj(zend_object *obj)
+static zend_always_inline struct ze_stop_watch_obj *
+php_stop_watch_fetch_obj(zend_object *obj)
 {/*{{{*/
-	return (struct ze_performance_counter_obj *)((char *)obj - XtOffsetOf(struct ze_performance_counter_obj, zo));
+	return (struct ze_stop_watch_obj *)((char *)obj - XtOffsetOf(struct ze_stop_watch_obj, zo));
 }/*}}}*/
 #else
-struct ze_performance_counter_obj {
+struct ze_stop_watch_obj {
 	zend_object zo;
 	tick_t start;
 	tick_t elapsed;

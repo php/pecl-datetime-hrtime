@@ -21,9 +21,15 @@
 	</stability>
 	<license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
 	<notes>
+		- Major refactoring of the class structure, as described below
 		- HRTime\PerformanceCounter::getFrequency() is now static
 		- add HRTime\PerformanceCounter::getTicks()
 		- add HRTime\PerformanceCounter::getTicksSince()
+		- moved HRTime\PerformanceCounter::start() to HRTime\StopWatch::start()
+		- moved HRTime\PerformanceCounter::stop() to HRTime\StopWatch::stop()
+		- moved HRTime\PerformanceCounter::getElapsedTicks() to HRTime\StopWatch::getElapsedTicks()
+		- moved HRTime\PerformanceCounter::getLastElapsedTicks() to HRTime\StopWatch::getLastElapsedTicks()
+		- moved HRTime\PerformanceCounter::isRunning() to HRTime\StopWatch::isRunning()
 	</notes>
 	<contents>
 		<dir name="/">
