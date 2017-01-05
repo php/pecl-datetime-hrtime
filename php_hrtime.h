@@ -62,6 +62,8 @@ PHP_METHOD(PerformanceCounter, getElapsedTicks);
 PHP_METHOD(PerformanceCounter, getLastElapsedTicks);
 PHP_METHOD(PerformanceCounter, getFrequency);
 PHP_METHOD(PerformanceCounter, isRunning);
+PHP_METHOD(PerformanceCounter, getTicks);
+PHP_METHOD(PerformanceCounter, getTicksSince);
 
 PHP_METHOD(StopWatch, getElapsedTime);
 PHP_METHOD(StopWatch, getLastElapsedTime);

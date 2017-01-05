@@ -60,8 +60,10 @@ const zend_function_entry PerformanceCounter_methods[] = {/*{{{*/
 	PHP_ME(PerformanceCounter, stop, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(PerformanceCounter, getElapsedTicks, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(PerformanceCounter, getLastElapsedTicks, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(PerformanceCounter, getFrequency, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(PerformanceCounter, getFrequency, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(PerformanceCounter, isRunning, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(PerformanceCounter, getTicks, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(PerformanceCounter, getTicksSince, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	{NULL, NULL, NULL}
 };/*}}}*/
 
@@ -409,6 +411,26 @@ PHP_METHOD(PerformanceCounter, isRunning)
 #endif
 
 	RETURN_BOOL(zvco->is_running);
+}/*}}}*/
+
+PHP_METHOD(PerformanceCounter, getTicks)
+{/*{{{*/
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+
+	RETURN_LONG(timer_current());
+}/*}}}*/
+
+PHP_METHOD(PerformanceCounter, getTicksSince)
+{/*{{{*/
+	zend_long base;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &base) == FAILURE) {
+		return;
+	}
+
+	RETURN_LONG(timer_elapsed_ticks(base));
 }/*}}}*/
 
 #define RET_TIME_BY_UNIT(t, unit) do { \
