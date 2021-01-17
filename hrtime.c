@@ -111,7 +111,7 @@ php_stop_watch_obj_destroy(void *obj TSRMLS_DC)
 {/*{{{*/
 	struct ze_stop_watch_obj *zswo = (struct ze_stop_watch_obj *)obj;
 
-	zend_object_std_dtor(&zswo->zo TSRMLS_CC);
+	zend_object_std_dtor(&zswo->zo);
 
 	/*hrtime_counter_destroy(&zswo->htc);*/
 
@@ -151,7 +151,7 @@ php_stop_watch_obj_init(zend_class_entry *ze TSRMLS_DC)
 	zswo = (struct ze_stop_watch_obj *)emalloc(sizeof(struct ze_stop_watch_obj));
 	memset(&zswo->zo, 0, sizeof(zend_object));
 
-	zend_object_std_init(&zswo->zo, ze TSRMLS_CC);
+	zend_object_std_init(&zswo->zo, ze);
 #if PHP_VERSION_ID < 50399
 	zend_hash_copy(zswo->zo.properties, &ze->default_properties, (copy_ctor_func_t) zval_add_ref,
 					(void *) &tmp, sizeof(zval *));
@@ -166,7 +166,7 @@ php_stop_watch_obj_init(zend_class_entry *ze TSRMLS_DC)
 
 	ret.handle = zend_objects_store_put(zswo, NULL,
 										(zend_objects_free_object_storage_t) php_stop_watch_obj_destroy,
-										NULL TSRMLS_CC);
+										NULL);
 #if PHP_VERSION_ID < 50399
 	ret.handlers = zend_get_std_object_handlers();
 	ret.handlers->clone_obj = NULL;
@@ -211,7 +211,7 @@ PHP_MINIT_FUNCTION(hrtime)
 	zend_class_entry ce;
 
 	if (timer_lib_initialize()) {
-		php_error_docref(NULL TSRMLS_CC, E_ERROR, "Failed to initialize internal timer");
+		php_error_docref(NULL, E_ERROR, "Failed to initialize internal timer");
 		return FAILURE;
 	}
 
@@ -227,22 +227,22 @@ PHP_MINIT_FUNCTION(hrtime)
 	/* Init internal classes */
 	INIT_CLASS_ENTRY(ce, "HRTime\\PerformanceCounter", PerformanceCounter_methods);
 	ce.create_object = php_stop_watch_obj_init;
-	PerformanceCounter_ce = zend_register_internal_class(&ce TSRMLS_CC);
+	PerformanceCounter_ce = zend_register_internal_class(&ce);
 
 	INIT_CLASS_ENTRY(ce, "HRTime\\StopWatch", StopWatch_methods);
 	ce.create_object = php_stop_watch_obj_init;
 #if PHP_MAJOR_VERSION >= 7
 	StopWatch_ce = zend_register_internal_class_ex(&ce, PerformanceCounter_ce);
 #else
-	StopWatch_ce = zend_register_internal_class_ex(&ce, PerformanceCounter_ce, "HRTime\\PerformanceCounter" TSRMLS_CC);
+	StopWatch_ce = zend_register_internal_class_ex(&ce, PerformanceCounter_ce, "HRTime\\PerformanceCounter");
 #endif
 
 	INIT_CLASS_ENTRY(ce, "HRTime\\Unit", NULL);
-	Unit_ce = zend_register_internal_class(&ce TSRMLS_CC);
-	zend_declare_class_constant_long(Unit_ce, "SECOND", sizeof("SECOND")-1, HRTIME_SECOND TSRMLS_CC);
-	zend_declare_class_constant_long(Unit_ce, "MILLISECOND", sizeof("MILLISECOND")-1, HRTIME_MILLISECOND TSRMLS_CC);
-	zend_declare_class_constant_long(Unit_ce, "MICROSECOND", sizeof("MICROSECOND")-1, HRTIME_MICROSECOND TSRMLS_CC);
-	zend_declare_class_constant_long(Unit_ce, "NANOSECOND", sizeof("NANOSECOND")-1, HRTIME_NANOSECOND TSRMLS_CC);
+	Unit_ce = zend_register_internal_class(&ce);
+	zend_declare_class_constant_long(Unit_ce, "SECOND", sizeof("SECOND")-1, HRTIME_SECOND);
+	zend_declare_class_constant_long(Unit_ce, "MILLISECOND", sizeof("MILLISECOND")-1, HRTIME_MILLISECOND);
+	zend_declare_class_constant_long(Unit_ce, "MICROSECOND", sizeof("MICROSECOND")-1, HRTIME_MICROSECOND);
+	zend_declare_class_constant_long(Unit_ce, "NANOSECOND", sizeof("NANOSECOND")-1, HRTIME_NANOSECOND);
 
 	/* 
 	REGISTER_INI_ENTRIES();
@@ -308,11 +308,11 @@ PHP_METHOD(StopWatch, start)
 #if PHP_MAJOR_VERSION >= 7
 	zswo = php_stop_watch_fetch_obj(Z_OBJ_P(getThis()));
 #else
-	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis());
 #endif
 
 	if (zswo->is_running) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "The counter is already running");
+		php_error_docref(NULL, E_WARNING, "The counter is already running");
 		return;
 	}
 
@@ -331,11 +331,11 @@ PHP_METHOD(StopWatch, stop)
 #if PHP_MAJOR_VERSION >= 7
 	zswo = php_stop_watch_fetch_obj(Z_OBJ_P(getThis()));
 #else
-	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis());
 #endif
 
 	if (!zswo->is_running) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "The counter is not running");
+		php_error_docref(NULL, E_WARNING, "The counter is not running");
 		return;
 	}
 
@@ -355,11 +355,11 @@ PHP_METHOD(StopWatch, getElapsedTicks)
 #if PHP_MAJOR_VERSION >= 7
 	zswo = php_stop_watch_fetch_obj(Z_OBJ_P(getThis()));
 #else
-	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis());
 #endif
 
 	if (zswo->is_running) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Counter is still running");
+		php_error_docref(NULL, E_WARNING, "Counter is still running");
 	}
 
 	RETURN_LONG(zswo->elapsed);
@@ -376,11 +376,11 @@ PHP_METHOD(StopWatch, getLastElapsedTicks)
 #if PHP_MAJOR_VERSION >= 7
 	zswo = php_stop_watch_fetch_obj(Z_OBJ_P(getThis()));
 #else
-	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis());
 #endif
 
 	if (zswo->is_running) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Counter is still running");
+		php_error_docref(NULL, E_WARNING, "Counter is still running");
 		RETURN_LONG(0);
 	}
 
@@ -407,7 +407,7 @@ PHP_METHOD(StopWatch, isRunning)
 #if PHP_MAJOR_VERSION >= 7
 	zswo = php_stop_watch_fetch_obj(Z_OBJ_P(getThis()));
 #else
-	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis());
 #endif
 
 	RETURN_BOOL(zswo->is_running);
@@ -426,7 +426,7 @@ PHP_METHOD(PerformanceCounter, getTicksSince)
 {/*{{{*/
 	zend_long base;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &base) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &base) == FAILURE) {
 		return;
 	}
 
@@ -459,14 +459,14 @@ PHP_METHOD(StopWatch, getElapsedTime)
 	struct ze_stop_watch_obj *zswo;
 	zend_long unit;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|l", &unit) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|l", &unit) == FAILURE) {
 		RETURN_NULL();
 	}
 
 #if PHP_MAJOR_VERSION >= 7
 	zswo = php_stop_watch_fetch_obj(Z_OBJ_P(getThis()));
 #else
-	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis());
 #endif
 
 	RET_TIME_BY_UNIT(zswo->elapsed, unit);
@@ -477,14 +477,14 @@ PHP_METHOD(StopWatch, getLastElapsedTime)
 	struct ze_stop_watch_obj *zswo;
 	zend_long unit;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|l", &unit) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|l", &unit) == FAILURE) {
 		RETURN_NULL();
 	}
 
 #if PHP_MAJOR_VERSION >= 7
 	zswo = php_stop_watch_fetch_obj(Z_OBJ_P(getThis()));
 #else
-	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	zswo = (struct ze_stop_watch_obj *) zend_object_store_get_object(getThis());
 #endif
 
 	RET_TIME_BY_UNIT(zswo->elapsed_ref, unit);
